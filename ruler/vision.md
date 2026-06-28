@@ -1,0 +1,134 @@
+---
+title: Vision — 최종 비전
+category: 하네스
+---
+
+# Vision — 404 Playground
+
+> 이 파일은 **유저가 작성하고 갱신한다**.
+> 모든 에이전트(Planner, Researcher, Implementer, Reviewer, Security Auditor, QA, Guardian, Reporter)는
+> 이 문서를 **유일한 진실의 원천(Single Source of Truth)** 으로 삼는다.
+> 상세 설계는 `docs/PLAN.md` (v2)에 있으며, 이 파일은 그 요지를 하네스 형식으로 고정한 것이다.
+
+---
+
+## 1. 한 줄 목표
+
+> 404·500 에러 페이지에 도달한 방문자가 그냥 이탈하지 않도록, **가벼운 인터랙션(미니게임·애니메이션)** 으로 잠깐 머물며 더 나은 기분으로 돌아갈 수 있게 한다 — 개발자는 **div 하나 + 한 줄 설정**으로 끝낸다.
+
+---
+
+## 2. 사용자와 가치
+
+### 2.1 Primary User
+
+- **누구:** 자기 서비스의 에러 페이지를 개선하려는 **프론트엔드 개발자** (프레임워크 무관: React/Vue/순수 HTML 등).
+- **현재 어떻게 해결 중:** 정적 "404 Not Found" + 홈 버튼. 개선하려면 직접 구현해야 함.
+- **현재 방식의 고통:** 에러 페이지 이탈률이 높다. 직접 만들면 손이 많이 가고, 무겁게 만들면 에러 페이지의 "가벼움" 성격과 충돌한다.
+- **최종 수혜자:** 의도치 않게 에러 페이지에 도달한 **방문자**.
+
+### 2.2 얻는 가치
+
+```
+개발자: "div 하나 꽂고 한 줄 호출했더니 끝났다. 무겁지도 않다."
+방문자: "에러 페이지인데 잠깐 게임하다 기분 좋게 돌아갔다."
+```
+
+---
+
+## 3. 성공 기준 (Definition of Done for the Vision)
+
+- [ ] 코어 번들 **≤ 8KB gzip** (러너 청크 ≤ 20KB gzip)
+- [ ] `div` + `mount()` **한 줄**로 동작, 특정 프레임워크에 비의존(vanilla·React 동일 동작)
+- [ ] **불변식**: 경험 청크 로드가 실패해도(500 상황) 상태코드·메시지·홈/뒤로 링크는 **항상** 노출
+- [ ] 폴백은 **네트워크 0회**로 즉시 렌더(인라인 코어 + 모드 B 권장)
+
+---
+
+## 4. In Scope (v1에서 하는 것)
+
+- 명령형 `mount(el, config)` API (단일 진입점)
+- Tier 0 정적 폴백 (인라인, 모드 A=빈 div 렌더 / 모드 B=기존 DOM 향상)
+- **Canvas 2D 러너 게임(공룡게임류)** — 플래그십 경험
+- contract 검증용 trivial 경험 1종
+- 동적 `import()` 기반 lazy 로딩 + graceful degradation(실패 시 폴백 유지)
+- ESM + IIFE 빌드 (npm + CDN/인라인)
+- vanilla·React 통합 예제
+- `messages`/`locale` 외부 주입, `theme`/`reducedMotion` 확정 처리
+- `onEvent` 훅(ready/start/score/gameover/error)
+
+---
+
+## 5. Out of Scope (하지 않는 것 — Guardian 차단 근거)
+
+- **Custom Element `<error-playground>`** (v2)
+- **WebGL/3D(Three.js), iframe 임베드** (v2)
+- **공개 플러그인 등록 레지스트리 API** (v2 — v1은 `experience` 객체 직접 주입만, experimental)
+- **네트워크/디바이스 기반 auto Tier 선택 휴리스틱** (v2 — 에러 페이지는 네트워크가 불안정)
+- 다수 게임/CSS 애니메이션 모음 (v1은 러너 1종)
+- **특정 프레임워크 의존**(React/Next/Tailwind 등) — 코어는 프레임워크 독립 바닐라 TS
+- 서버·인증·DB·라우팅·에러 핸들링 자체 (우리는 "표시 레이어"만)
+- i18n 번들 풀세트 (문자열 외부 주입까지만)
+
+---
+
+## 6. 기술적 제약 (Hard Constraints)
+
+| 항목 | 값 | 비고 |
+|------|-----|------|
+| 언어 | TypeScript (`strict: true`) | `any` 금지 |
+| 빌드 | Vite library mode → **ESM + IIFE** | 2-빌드 |
+| 런타임 의존성 | **코어 0개**(바닐라) | 3D는 v2에서 Three.js(동적 import) |
+| 배포 | 정적 파일 (CDN/인라인 + npm) | |
+| 성능 | 코어 ≤ 8KB gzip, 러너 청크 ≤ 20KB gzip, 폴백 즉시(네트워크 0회) | CI 예산 게이트 |
+| 보안 | XSS 방지(`innerHTML` 금지·텍스트만), CSP 호환, 시크릿 없음 | `ruler/security.md` |
+| 접근성 | 폴백 항상 노출, 키보드 조작, `prefers-reduced-motion` 존중 | `ruler/a11y.md` |
+| 프레임워크 | **독립** — 특정 프레임워크 비의존 | 프레임워크는 examples/에서만 |
+
+---
+
+## 7. 비기능 요구사항 (Non-Functional)
+
+- **성능:** 폴백 즉시 렌더, 무거운 경험은 lazy 청크. 초기 에러 페이지 로드에 게임 코드 미포함.
+- **보안:** 외부 입력은 텍스트로만 주입, CSP nonce/hash 안내, 런타임 의존성 0 유지.
+- **접근성:** 상태코드·메시지·홈/뒤로 링크 항상 접근 가능(포커스 트랩 금지), 소리 기본 off, 모션 선호 존중.
+- **운영:** `onEvent` 훅으로 호스트가 계측(옵트인, PII 금지).
+
+---
+
+## 8. 용어집 (Glossary)
+
+| 용어 | 정의 |
+|------|------|
+| Experience | `mount`/`unmount` 계약을 구현한 경험 플러그인(게임·애니메이션) |
+| Tier | 경험의 무게/방식 등급 (0 폴백 · 1 CSS · 2 Canvas · 3 WebGL · 4 iframe) |
+| 모드 A / 모드 B | A=빈 div에 JS가 렌더 / B=기존 폴백 DOM을 향상(JS 실패해도 정적 에러 유지) |
+| 폴백(Tier 0) | 상태코드 + 핵심 메시지 + 홈/뒤로 링크의 최소 정적 화면 |
+| assetBase | 경험 청크를 동적 로드할 기준 URL |
+| 불변식 | "어떤 실패 경로에서도 에러 정보는 항상 보인다" |
+
+---
+
+## 9. 열린 질문 (Open Questions)
+
+- [ ] 인라인 코어의 CSP nonce/hash 배포 자동화 방법
+- [ ] (v2) 3D 청크 트리셰이킹 후 실제 용량(목표 대비)
+- [ ] (v2) Custom Element 도입 시 React 구버전 prop/event 상호운용
+- [ ] (v2) iframe 경험의 콘텐츠 출처/심사 정책
+
+---
+
+## 10. 변경 이력
+
+| 날짜 | 변경 | 사유 |
+|------|------|------|
+| 2026-06-25 | 최초 작성 (`docs/PLAN.md` v2 기반) | 하네스 SSOT 정합화 |
+
+---
+
+## AI 에이전트에게
+
+- 이 문서가 **유일한 진실의 원천**이다. 상세는 `docs/PLAN.md`.
+- 여기 적히지 않은 결정은 유저에게 **반드시 질문**한다.
+- §5(Out of Scope)는 VIOLATION 차단의 근거다. 특히 "특정 프레임워크 의존"과 "v2 항목"의 v1 구현을 막는다.
+- 이 문서를 수정해야 한다고 판단되면 Guardian을 통해 유저 승인을 받는다. 직접 편집 금지.
