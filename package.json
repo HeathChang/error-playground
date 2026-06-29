@@ -5,11 +5,11 @@
   "type": "module",
   "main": "./dist/error-playground.js",
   "module": "./dist/error-playground.js",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/types/core/index.d.ts",
   "unpkg": "./dist/error-playground.iife.js",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./dist/types/core/index.d.ts",
       "import": "./dist/error-playground.js"
     }
   },

@@ -23,8 +23,23 @@
       <a href="/">홈으로</a>
     </div>
 
+    <h2>M1 — 경험 동적 로드 + graceful degradation</h2>
+    <p class="muted" style="margin:.2rem 0 .6rem;color:#64748b;font-size:.9rem">
+      폴백 위에 경험을 동적으로 올립니다. 실패해도 폴백은 그대로 유지됩니다.
+    </p>
+    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+      <button id="load-noop">경험 로드 (noop)</button>
+      <button id="load-fail">실패 시뮬 (unknown)</button>
+    </div>
+    <div id="c" class="demo"></div>
+    <pre id="log" style="background:#f1f5f9;padding:8px;border-radius:8px;font-size:.8rem;max-height:140px;overflow:auto"></pre>
+
     <script type="module">
       import { mount } from '../../src/core/index.ts';
+
+      const log = (msg) => {
+        document.getElementById('log').textContent += msg + '\n';
+      };
 
       mount('#a', {
         status: 404,
@@ -35,6 +50,20 @@
 
       // 모드 B: 컨테이너에 이미 내용이 있어 코어는 건드리지 않음
       mount('#b', { status: 500 });
+
+      // M1: 경험 동적 로드 데모
+      const handle = mount('#c', {
+        status: 404,
+        onEvent: (e) => log(`event: ${e.type}${e.type === 'error' ? ' → ' + e.cause?.message : ''}`),
+      });
+      document.getElementById('load-noop').addEventListener('click', () => {
+        log('--- setExperience("noop") ---');
+        handle.setExperience('noop');
+      });
+      document.getElementById('load-fail').addEventListener('click', () => {
+        log('--- setExperience("unknown") — 폴백 유지되어야 함 ---');
+        handle.setExperience('unknown');
+      });
     </script>
   </body>
 </html>

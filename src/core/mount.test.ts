@@ -68,10 +68,13 @@ describe('mount — Tier 0 폴백 (M0)', () => {
     expect(() => mount('#nope')).toThrow(/대상을 찾을 수 없습니다/);
   });
 
-  it('setExperience() should reject until M1', async () => {
+  it('setExperience("runner") resolves gracefully (M2 미등록 → 폴백 유지, no throw)', async () => {
     const el = document.createElement('div');
     document.body.appendChild(el);
-    await expect(mount(el).setExperience('runner')).rejects.toThrow(/M1/);
+    const handle = mount(el);
+    // 'runner'는 M2에서 등록 — 지금은 미등록이라 graceful 폴백(reject 아님)
+    await expect(handle.setExperience('runner')).resolves.toBeUndefined();
+    expect(el.querySelector('.ep-root')).not.toBeNull();
   });
 });
 
