@@ -24,12 +24,18 @@ describe('loader — resolveExperience', () => {
     const exp = await resolveExperience('noop');
     expect(isExperience(exp)).toBe(true);
   });
+
+  it('should dynamically import the built-in "runner" experience (M2)', async () => {
+    const exp = await resolveExperience('runner');
+    expect(isExperience(exp)).toBe(true);
+  });
 });
 
 describe('loader — helpers', () => {
   it('hasBuiltin reflects the registry', () => {
     expect(hasBuiltin('noop')).toBe(true);
-    expect(hasBuiltin('runner')).toBe(false); // M2
+    expect(hasBuiltin('runner')).toBe(true); // M2 등록됨
+    expect(hasBuiltin('nope')).toBe(false);
   });
 
   it('isExperience type guard', () => {

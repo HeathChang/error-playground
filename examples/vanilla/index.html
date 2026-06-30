@@ -28,6 +28,7 @@
       폴백 위에 경험을 동적으로 올립니다. 실패해도 폴백은 그대로 유지됩니다.
     </p>
     <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+      <button id="load-runner">러너 게임 로드 (runner)</button>
       <button id="load-noop">경험 로드 (noop)</button>
       <button id="load-fail">실패 시뮬 (unknown)</button>
     </div>
@@ -55,6 +56,10 @@
       const handle = mount('#c', {
         status: 404,
         onEvent: (e) => log(`event: ${e.type}${e.type === 'error' ? ' → ' + e.cause?.message : ''}`),
+      });
+      document.getElementById('load-runner').addEventListener('click', () => {
+        log('--- setExperience("runner") · 캔버스 클릭/스페이스로 플레이 ---');
+        handle.setExperience('runner');
       });
       document.getElementById('load-noop').addEventListener('click', () => {
         log('--- setExperience("noop") ---');
