@@ -14,7 +14,7 @@
     }
   },
   "files": ["dist"],
-  "sideEffects": false,
+  "sideEffects": ["**/error-playground.js", "**/error-playground.iife.js"],
   "scripts": {
     "dev": "vite",
     "build": "vite build && tsc -p tsconfig.build.json",
