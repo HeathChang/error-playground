@@ -52,7 +52,7 @@
 
 | 영역 | v1 (MVP) — **IN** | v2+ — **유보** | 유보 근거 |
 | --- | --- | --- | --- |
-| 통합 API | 명령형 `mount(el, config)` | Custom Element `<error-playground>` | `mount()`만으로 모든 프레임워크 이미 커버. CE는 부가 편의 |
+| 통합 API | 명령형 `mount(el, config)` + **Custom Element `<error-playground>`** | — | `mount()`는 범용 명령형, CE는 모든 프레임워크용 선언적 태그 (2026-07-01 v1 승격) |
 | 폴백 | Tier 0 정적 폴백 (인라인) | — | 장애 대응의 근간, 필수 |
 | 경험 | **Canvas 러너 게임 1종** + contract 검증용 trivial 1종 | 다수 게임, CSS 모음 | 플래그십 1개로 아키텍처 검증 |
 | 3D / iframe | ❌ | WebGL(Three.js), iframe 임베드 | 용량·복잡도 큼. 코어 검증 후 |
@@ -337,7 +337,7 @@ return <div ref={ref}><h1>404</h1><a href="/">홈</a></div>; // 폴백 동봉
 | **M2 — 플래그십: Canvas 러너** | 공룡게임류 러너 | 키보드/터치, 점수, 재시작, reduced-motion 대응, 이벤트 emit |
 | **M3 — 통합 예제 + 문서** | vanilla/React 예제, README/API | 두 환경 동일 동작, 인라인 코어+모드 B 데모, CSP 안내 |
 
-> Custom Element·3D·iframe·공개 레지스트리·auto Tier는 **v2 백로그**.
+> 3D·iframe·공개 레지스트리·auto Tier는 **v2 백로그**. (Custom Element는 v1으로 승격 — 2026-07-01)
 
 ---
 
@@ -348,7 +348,7 @@ return <div ref={ref}><h1>404</h1><a href="/">홈</a></div>; // 폴백 동봉
 | 1차 플래그십 경험 | **Canvas 2D 러너(공룡게임류)** |
 | 배포 형태 | **CDN(IIFE/인라인) + npm(ESM) 둘 다** |
 | 프로젝트 성격 | **순수 엔진 + 기본 콘텐츠** (커스텀 주입 가능) |
-| v1 통합 API | **명령형 `mount()`만** (Custom Element는 v2) |
+| v1 통합 API | **명령형 `mount()` + Custom Element `<error-playground>`** (CE v1 승격, 2026-07-01) |
 | 에러 페이지 권장 패턴 | **모드 B(기존 DOM 향상) + 코어 인라인** |
 | 확장 방식(v1) | `experience` 객체 직접 주입(experimental), 공개 레지스트리는 v2 |
 | 타겟 프레임워크 검증 | vanilla + React 우선 (나머지 v2) |
