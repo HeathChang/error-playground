@@ -32,7 +32,12 @@ function isReducedMotion(v: string | null): v is ReducedMotionOption {
   return v === 'auto' || v === 'force' || v === 'off';
 }
 
-export class ErrorPlaygroundElement extends HTMLElement {
+// SSR/Node 안전: HTMLElement가 없는 환경(서버 렌더/프리렌더)에서 import해도 크래시하지 않도록
+// 더미 클래스를 상속한다. 실제 등록(defineErrorPlayground)은 브라우저에서만 일어난다.
+const HTMLElementBase: typeof HTMLElement =
+  typeof HTMLElement !== 'undefined' ? HTMLElement : (class {} as unknown as typeof HTMLElement);
+
+export class ErrorPlaygroundElement extends HTMLElementBase {
   private handle: PlaygroundHandle | null = null;
   private configProp: PlaygroundConfig | null = null;
 
