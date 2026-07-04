@@ -23,6 +23,7 @@ const OBSERVED = [
   'asset-base',
   'message-title',
   'message-description',
+  'src',
 ] as const;
 
 function isTheme(v: string | null): v is ThemeOption {
@@ -108,6 +109,9 @@ export class ErrorPlaygroundElement extends HTMLElementBase {
         ...(back ? { back: true } : {}),
       };
     }
+
+    const src = this.getAttribute('src');
+    if (src) cfg.options = { ...cfg.options, src };
 
     return cfg;
   }

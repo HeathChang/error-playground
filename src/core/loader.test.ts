@@ -29,12 +29,18 @@ describe('loader — resolveExperience', () => {
     const exp = await resolveExperience('runner');
     expect(isExperience(exp)).toBe(true);
   });
+
+  it('should dynamically import the built-in "iframe" experience (v2)', async () => {
+    const exp = await resolveExperience('iframe');
+    expect(isExperience(exp)).toBe(true);
+  });
 });
 
 describe('loader — helpers', () => {
   it('hasBuiltin reflects the registry', () => {
     expect(hasBuiltin('noop')).toBe(true);
     expect(hasBuiltin('runner')).toBe(true); // M2 등록됨
+    expect(hasBuiltin('iframe')).toBe(true); // v2 등록됨
     expect(hasBuiltin('nope')).toBe(false);
   });
 

@@ -76,7 +76,15 @@ export function mount(target: string | HTMLElement, config: PlaygroundConfig = {
       container.appendChild(host);
       experienceHost = host;
 
-      const ctx: ExperienceContext = { status, reducedMotion, theme, locale, emit, root: host };
+      const ctx: ExperienceContext = {
+        status,
+        reducedMotion,
+        theme,
+        locale,
+        emit,
+        root: host,
+        options: config.options,
+      };
       await experience.mount(host, ctx);
 
       if (disposed || token !== loadToken) {

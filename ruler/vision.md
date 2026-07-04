@@ -49,6 +49,7 @@ category: 하네스
 
 - 명령형 `mount(el, config)` API (단일 진입점)
 - **Custom Element `<error-playground>`** — 모든 프레임워크에서 태그 하나로 동작(선언적). 속성/`config` property로 설정 (2026-07-01 v1 승격)
+- **iframe 경험** — 외부 콘텐츠/게임을 sandbox iframe으로 임베드 (v2 착수, 2026-07-04)
 - Tier 0 정적 폴백 (인라인, 모드 A=빈 div 렌더 / 모드 B=기존 DOM 향상)
 - **Canvas 2D 러너 게임(공룡게임류)** — 플래그십 경험
 - contract 검증용 trivial 경험 1종
@@ -62,7 +63,7 @@ category: 하네스
 
 ## 5. Out of Scope (하지 않는 것 — Guardian 차단 근거)
 
-- **WebGL/3D(Three.js), iframe 임베드** (v2)
+- **WebGL/3D(Three.js)** (경량 원칙상 보류 — 옵셔널 peer-dependency 또는 CSS-3D로 재검토)
 - **공개 플러그인 등록 레지스트리 API** (v2 — v1은 `experience` 객체 직접 주입만, experimental)
 - **네트워크/디바이스 기반 auto Tier 선택 휴리스틱** (v2 — 에러 페이지는 네트워크가 불안정)
 - 다수 게임/CSS 애니메이션 모음 (v1은 러너 1종)
@@ -124,6 +125,7 @@ category: 하네스
 |------|------|------|
 | 2026-06-25 | 최초 작성 (`docs/PLAN.md` v2 기반) | 하네스 SSOT 정합화 |
 | 2026-07-01 | Custom Element `<error-playground>`를 v1으로 승격 (§5→§4) | 유저 최종 목표(모든 프레임워크에서 선언적 사용)에 직결 — 유저 승인 |
+| 2026-07-04 | v2 착수: iframe 경험 §5→§4. 3D(Three.js)는 경량 원칙상 보류/재검토 | 3D는 ~150KB로 에러 페이지 경량 정신과 충돌 → iframe 우선 (유저 승인) |
 
 ---
 

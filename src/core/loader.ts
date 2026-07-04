@@ -19,6 +19,7 @@ type ExperienceFactory = () => Experience;
 const BUILTINS: Record<string, () => Promise<unknown>> = {
   noop: () => import('../experiences/_noop/index'),
   runner: () => import('../experiences/runner/index'),
+  iframe: () => import('../experiences/iframe/index'),
 };
 
 export function hasBuiltin(name: string): boolean {

@@ -37,6 +37,19 @@
       style="display:block"
     ></error-playground>
 
+    <h2>iframe 경험 — 외부 콘텐츠 임베드 (v2)</h2>
+    <p class="muted" style="margin:.2rem 0 .6rem;color:#64748b;font-size:.9rem">
+      <code>experience="iframe"</code> + <code>src</code>로 외부 페이지를 sandbox iframe에 임베드.
+      (일부 사이트는 X-Frame-Options로 임베드를 막을 수 있어요)
+    </p>
+    <error-playground
+      status="404"
+      experience="iframe"
+      src="https://example.com"
+      class="demo"
+      style="display:block"
+    ></error-playground>
+
     <h2>M1 — 경험 동적 로드 + graceful degradation</h2>
     <p class="muted" style="margin:.2rem 0 .6rem;color:#64748b;font-size:.9rem">
       폴백 위에 경험을 동적으로 올립니다. 실패해도 폴백은 그대로 유지됩니다.

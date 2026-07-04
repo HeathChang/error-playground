@@ -337,7 +337,7 @@ return <div ref={ref}><h1>404</h1><a href="/">홈</a></div>; // 폴백 동봉
 | **M2 — 플래그십: Canvas 러너** | 공룡게임류 러너 | 키보드/터치, 점수, 재시작, reduced-motion 대응, 이벤트 emit |
 | **M3 — 통합 예제 + 문서** | vanilla/React 예제, README/API | 두 환경 동일 동작, 인라인 코어+모드 B 데모, CSP 안내 |
 
-> 3D·iframe·공개 레지스트리·auto Tier는 **v2 백로그**. (Custom Element는 v1으로 승격 — 2026-07-01)
+> 3D·공개 레지스트리·auto Tier는 **v2 백로그**. (Custom Element·iframe은 승격 — CE 2026-07-01, iframe 2026-07-04. 3D는 경량 원칙상 보류)
 
 ---
 

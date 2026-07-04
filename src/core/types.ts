@@ -37,6 +37,8 @@ export interface PlaygroundConfig {
   assetBase?: string;
   /** 라이프사이클 이벤트 콜백(옵트인 계측). */
   onEvent?: (event: PlaygroundEvent) => void;
+  /** 경험별 추가 파라미터 (예: iframe 경험의 `src`). 경험이 `ctx.options`로 읽는다. */
+  options?: Record<string, unknown>;
 }
 
 export interface PlaygroundHandle {
@@ -54,6 +56,8 @@ export interface ExperienceContext {
   locale: string;
   emit: (event: PlaygroundEvent) => void;
   root: HTMLElement | ShadowRoot;
+  /** config.options 패스스루 (경험별 파라미터). */
+  options?: Record<string, unknown>;
 }
 
 /**
