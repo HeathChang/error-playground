@@ -20,6 +20,7 @@ const BUILTINS: Record<string, () => Promise<unknown>> = {
   noop: () => import('../experiences/_noop/index'),
   runner: () => import('../experiences/runner/index'),
   iframe: () => import('../experiences/iframe/index'),
+  cube: () => import('../experiences/cube/index'),
 };
 
 export function hasBuiltin(name: string): boolean {

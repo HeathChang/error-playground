@@ -34,6 +34,11 @@ describe('loader — resolveExperience', () => {
     const exp = await resolveExperience('iframe');
     expect(isExperience(exp)).toBe(true);
   });
+
+  it('should dynamically import the built-in "cube" experience (v2)', async () => {
+    const exp = await resolveExperience('cube');
+    expect(isExperience(exp)).toBe(true);
+  });
 });
 
 describe('loader — helpers', () => {
@@ -41,6 +46,7 @@ describe('loader — helpers', () => {
     expect(hasBuiltin('noop')).toBe(true);
     expect(hasBuiltin('runner')).toBe(true); // M2 등록됨
     expect(hasBuiltin('iframe')).toBe(true); // v2 등록됨
+    expect(hasBuiltin('cube')).toBe(true); // v2 등록됨
     expect(hasBuiltin('nope')).toBe(false);
   });
 
