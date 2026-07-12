@@ -22,6 +22,7 @@ const BUILTINS: Record<string, () => Promise<unknown>> = {
   iframe: () => import('../experiences/iframe/index'),
   cube: () => import('../experiences/cube/index'),
   flappy: () => import('../experiences/flappy/index'),
+  stacker: () => import('../experiences/stacker/index'),
 };
 
 export function hasBuiltin(name: string): boolean {
