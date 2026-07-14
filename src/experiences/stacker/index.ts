@@ -1,36 +1,21 @@
 /**
  * stacker — 블록 쌓기 게임 (게임 카트리지).
- * 루프·입력·이벤트는 공통 콘솔(gameMachine)이 담당. 여기선 StackerGame·렌더를 Game으로 어댑트.
+ * 루프·입력·이벤트는 공통 콘솔(gameMachine)이, 캔버스 배관은 canvas.ts가 담당.
  */
 import type { Experience } from '../../core/types';
+import { canvasSupported, mountCanvas, type CanvasTheme } from '../canvas';
 import { gameMachine, type Game, type GameEnv } from '../machine';
 import { StackerGame } from './game';
-import { render, type StackerTheme } from './render';
+import { render } from './render';
 
-function pickTheme(theme: 'light' | 'dark'): StackerTheme {
+function pickTheme(theme: 'light' | 'dark'): CanvasTheme {
   return theme === 'dark'
     ? { bg: '#0f172a', fg: '#f8fafc', accent: '#f59e0b', muted: '#334155' }
     : { bg: '#f8fafc', fg: '#0f172a', accent: '#f59e0b', muted: '#cbd5e1' };
 }
 
-function canvasSupported(): boolean {
-  try {
-    const c = document.createElement('canvas');
-    return typeof c.getContext === 'function' && !!c.getContext('2d');
-  } catch {
-    return false;
-  }
-}
-
 function createStacker(env: GameEnv): Game {
-  const doc = env.host.ownerDocument;
-  const canvas = doc.createElement('canvas');
-  canvas.width = env.width;
-  canvas.height = env.height;
-  canvas.style.cssText = `display:block;width:100%;max-width:${env.width}px;border-radius:8px;touch-action:manipulation;`;
-  env.host.appendChild(canvas);
-
-  const context2d = canvas.getContext('2d');
+  const { canvas, ctx } = mountCanvas(env);
   const game = new StackerGame({ width: env.width, height: env.height });
   const theme = pickTheme(env.theme);
 
@@ -48,7 +33,7 @@ function createStacker(env: GameEnv): Game {
       game.step(dt);
     },
     render() {
-      if (context2d) render(context2d, game, theme);
+      if (ctx) render(ctx, game, theme);
     },
     destroy() {
       canvas.remove();

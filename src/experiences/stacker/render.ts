@@ -2,16 +2,10 @@
  * 스태커 게임 Canvas 2D 렌더 (순수 그리기 — 상태 변경 없음).
  * 스택이 화면보다 높아지면 위쪽이 보이도록 아래로 오프셋.
  */
+import type { CanvasTheme } from '../canvas';
 import { BLOCK_H, type StackerGame } from './game';
 
-export interface StackerTheme {
-  bg: string;
-  fg: string;
-  accent: string;
-  muted: string;
-}
-
-export function render(ctx: CanvasRenderingContext2D, game: StackerGame, theme: StackerTheme): void {
+export function render(ctx: CanvasRenderingContext2D, game: StackerGame, theme: CanvasTheme): void {
   const { width, height } = game;
 
   ctx.fillStyle = theme.bg;

@@ -1,20 +1,14 @@
 /**
  * 오빗 게임 Canvas 2D 렌더 (순수 그리기 — 상태 변경 없음).
  */
+import type { CanvasTheme } from '../canvas';
 import type { OrbitGame } from './game';
-
-export interface OrbitTheme {
-  bg: string;
-  fg: string;
-  accent: string;
-  muted: string;
-}
 
 function pointOn(cx: number, cy: number, r: number, angle: number): [number, number] {
   return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
 }
 
-export function render(ctx: CanvasRenderingContext2D, game: OrbitGame, theme: OrbitTheme): void {
+export function render(ctx: CanvasRenderingContext2D, game: OrbitGame, theme: CanvasTheme): void {
   const { width, height, cx, cy, rInner, rOuter } = game;
 
   ctx.fillStyle = theme.bg;

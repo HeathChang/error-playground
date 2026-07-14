@@ -1,18 +1,12 @@
 /**
  * 플래피 게임 Canvas 2D 렌더 (순수 그리기 — 상태 변경 없음).
  */
+import type { CanvasTheme } from '../canvas';
 import { FLAPPY_GEO, type FlappyGame } from './game';
-
-export interface FlappyTheme {
-  bg: string;
-  fg: string;
-  accent: string;
-  muted: string;
-}
 
 const { BIRD_X, BIRD_R, PIPE_W, GAP_H } = FLAPPY_GEO;
 
-export function render(ctx: CanvasRenderingContext2D, game: FlappyGame, theme: FlappyTheme): void {
+export function render(ctx: CanvasRenderingContext2D, game: FlappyGame, theme: CanvasTheme): void {
   const { width, height, groundY } = game;
 
   ctx.fillStyle = theme.bg;

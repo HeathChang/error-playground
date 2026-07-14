@@ -2,16 +2,10 @@
  * 러너 게임 상태를 Canvas 2D에 그린다(미니멀 도형 — 아트 에셋 0, 용량 최소).
  * 순수 그리기 함수: 게임 상태를 변경하지 않는다.
  */
+import type { CanvasTheme } from '../canvas';
 import type { RunnerGame } from './game';
 
-export interface RunnerTheme {
-  bg: string;
-  fg: string;
-  accent: string;
-  muted: string;
-}
-
-export function render(ctx: CanvasRenderingContext2D, game: RunnerGame, theme: RunnerTheme): void {
+export function render(ctx: CanvasRenderingContext2D, game: RunnerGame, theme: CanvasTheme): void {
   const { width, height, groundY } = game;
 
   ctx.fillStyle = theme.bg;
