@@ -24,6 +24,7 @@ const BUILTINS: Record<string, () => Promise<unknown>> = {
   flappy: () => import('../experiences/flappy/index'),
   stacker: () => import('../experiences/stacker/index'),
   orbit: () => import('../experiences/orbit/index'),
+  rhythm: () => import('../experiences/rhythm/index'),
 };
 
 export function hasBuiltin(name: string): boolean {
