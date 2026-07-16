@@ -33,6 +33,8 @@ export interface PlaygroundConfig {
   locale?: string;
   /** 'auto'(기본)는 prefers-reduced-motion을 따름. */
   reducedMotion?: ReducedMotionOption;
+  /** 컨테이너가 높이를 안 줄 때의 최소 높이(px). 기본 240. 컨테이너가 이미 더 크면 무시. */
+  minHeight?: number;
   /** 경험 청크를 동적 로드할 기준 URL. (M1+, docs/PLAN.md §8) */
   assetBase?: string;
   /** 라이프사이클 이벤트 콜백(옵트인 계측). */

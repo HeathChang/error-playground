@@ -79,6 +79,31 @@ describe('mount — Tier 0 폴백 (M0)', () => {
   });
 });
 
+describe('반응형 컨테이너 박스 (사이징)', () => {
+  it('gives a static container a box so fallback can fill (position + min-height)', () => {
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    mount(el, { status: 404 });
+    expect(el.style.position).toBe('relative');
+    expect(el.style.minHeight).toBe('240px'); // 높이 없는 컨테이너 → 기본 바닥값
+  });
+
+  it('respects a custom minHeight', () => {
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    mount(el, { minHeight: 400 });
+    expect(el.style.minHeight).toBe('400px');
+  });
+
+  it('renders the fallback root as a fill layer (absolute)', () => {
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    mount(el, { status: 404 });
+    // .ep-root는 스타일시트에서 position:absolute;inset:0 로 컨테이너를 채운다
+    expect(el.querySelector('.ep-root')).not.toBeNull();
+  });
+});
+
 describe('safeHref — open redirect 방지 (보안)', () => {
   it('should allow http(s) and absolute paths', () => {
     expect(safeHref('https://example.com')).toBe('https://example.com');

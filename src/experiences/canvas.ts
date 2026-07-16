@@ -40,7 +40,8 @@ export function mountCanvas(env: GameEnv): {
   const canvas = doc.createElement('canvas');
   canvas.width = env.width;
   canvas.height = env.height;
-  canvas.style.cssText = `display:block;width:100%;max-width:${env.width}px;border-radius:8px;touch-action:manipulation;`;
+  // 논리 크기(env.width×height)로 그리되, 호스트보다 크면 축소되고 flex 호스트가 가운데 정렬한다.
+  canvas.style.cssText = `display:block;max-width:100%;max-height:100%;border-radius:8px;touch-action:manipulation;`;
   env.host.appendChild(canvas);
   return { canvas, ctx: canvas.getContext('2d') };
 }

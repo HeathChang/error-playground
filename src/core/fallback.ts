@@ -42,6 +42,7 @@ function ensureStyle(doc: Document): void {
   style.id = STYLE_ID;
   style.textContent = `
 .ep-root{--ep-color-text:#0f172a;--ep-color-muted:#64748b;--ep-color-bg:#f8fafc;--ep-color-brand:#0ea5e9;--ep-color-focus:#0ea5e9;
+  position:absolute;inset:0;box-sizing:border-box;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
   padding:32px 16px;text-align:center;color:var(--ep-color-text);background:var(--ep-color-bg);
   font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;}

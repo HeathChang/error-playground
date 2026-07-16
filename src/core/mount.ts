@@ -27,6 +27,17 @@ function resolveTarget(target: string | HTMLElement): HTMLElement {
 }
 
 /**
+ * 폴백/경험이 컨테이너 박스를 채우고 겹칠 수 있도록 기준 박스를 보장한다.
+ * - static이면 position:relative (오버레이 기준)
+ * - 높이가 없으면(auto로 collapse) min-height 바닥값 → 항상 보이게. 이미 더 크면 건드리지 않음.
+ */
+function ensureContainerBox(el: HTMLElement, minHeight: number): void {
+  const position = el.ownerDocument.defaultView?.getComputedStyle(el).position;
+  if (!position || position === 'static') el.style.position = 'relative';
+  if (el.clientHeight < minHeight) el.style.minHeight = `${minHeight}px`;
+}
+
+/**
  * 컨테이너에 404 Playground를 마운트한다.
  *
  * @param target CSS 셀렉터 또는 HTMLElement
@@ -40,6 +51,9 @@ export function mount(target: string | HTMLElement, config: PlaygroundConfig = {
   const reducedMotion = resolveReducedMotion(config.reducedMotion);
   const locale = resolveLocale(config.locale);
   const mode = detectMode(container);
+
+  // 컨테이너가 어떤 크기든(600×600, auto, 전체화면…) 폴백/경험이 그 박스를 채우도록 보장.
+  ensureContainerBox(container, config.minHeight ?? 240);
 
   const emit = (event: PlaygroundEvent): void => {
     config.onEvent?.(event);
@@ -73,6 +87,7 @@ export function mount(target: string | HTMLElement, config: PlaygroundConfig = {
       teardownExperience();
       const host = container.ownerDocument.createElement('div');
       host.className = 'ep-experience';
+      host.style.cssText = 'position:absolute;inset:0;'; // 폴백 위에 겹쳐 채움
       container.appendChild(host);
       experienceHost = host;
 
