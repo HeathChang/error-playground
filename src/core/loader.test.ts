@@ -59,6 +59,11 @@ describe('loader — resolveExperience', () => {
     const exp = await resolveExperience('rhythm');
     expect(isExperience(exp)).toBe(true);
   });
+
+  it('should dynamically import the built-in "gravity" experience (v2)', async () => {
+    const exp = await resolveExperience('gravity');
+    expect(isExperience(exp)).toBe(true);
+  });
 });
 
 describe('loader — helpers', () => {
@@ -71,6 +76,7 @@ describe('loader — helpers', () => {
     expect(hasBuiltin('stacker')).toBe(true); // v2 등록됨
     expect(hasBuiltin('orbit')).toBe(true); // v2 등록됨
     expect(hasBuiltin('rhythm')).toBe(true); // v2 등록됨
+    expect(hasBuiltin('gravity')).toBe(true); // v2 등록됨
     expect(hasBuiltin('nope')).toBe(false);
   });
 
