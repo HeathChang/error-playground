@@ -83,6 +83,7 @@ describe('loader — helpers', () => {
     expect(hasBuiltin('rhythm')).toBe(true); // v2 등록됨
     expect(hasBuiltin('gravity')).toBe(true); // v2 등록됨
     expect(hasBuiltin('timing')).toBe(true); // v2 등록됨
+    expect(hasBuiltin('zigzag')).toBe(true); // v2 등록됨
     expect(hasBuiltin('nope')).toBe(false);
   });
 
