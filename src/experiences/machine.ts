@@ -41,6 +41,7 @@ const MAX_W = 560;
 const MIN_H = 160;
 const MAX_H = 340;
 const DEFAULT_H = 220; // 컨테이너 높이가 0(auto collapse)일 때
+const READY_MSG = '미니 게임 준비됨 — 스페이스 또는 탭으로 시작하세요.';
 
 const clamp = (v: number, min: number, max: number): number => Math.max(min, Math.min(max, v));
 
@@ -75,6 +76,18 @@ export function gameMachine(factory: GameFactory, isSupported?: () => boolean): 
       container.appendChild(h);
       host = h;
 
+      // 스크린리더용 상태/점수 라이브 영역(시각적으로 숨김). 캔버스는 SR에 불투명하므로
+      // 준비/시작/점수/게임오버를 텍스트로도 전달한다 (ruler/a11y.md "캔버스/게임 접근성").
+      const live = doc.createElement('p');
+      live.className = 'ep-game-status';
+      live.setAttribute('aria-live', 'polite');
+      live.style.cssText =
+        'position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;';
+      h.appendChild(live);
+      const announce = (msg: string): void => {
+        live.textContent = msg;
+      };
+
       let started = false;
       let last = 0;
       let acc = 0;
@@ -105,9 +118,11 @@ export function gameMachine(factory: GameFactory, isSupported?: () => boolean): 
         if (milestone > lastMilestone) {
           lastMilestone = milestone;
           ctx.emit({ type: 'score', value: milestone * 100 });
+          announce(`점수 ${milestone * 100}점.`);
         }
         if (prev === 'running' && game.status === 'over') {
           ctx.emit({ type: 'gameover', score: game.score });
+          announce(`게임 오버 — 점수 ${game.score}점. 스페이스 또는 탭으로 다시 시작.`);
         }
 
         rafId = requestAnimationFrame(frame);
@@ -122,9 +137,12 @@ export function gameMachine(factory: GameFactory, isSupported?: () => boolean): 
 
       const onInput = (): void => {
         if (!game) return;
-        const wasRunning = game.status === 'running';
+        const prev = game.status;
         game.input();
-        if (!wasRunning && game.status === 'running') ctx.emit({ type: 'start' });
+        if (prev !== 'running' && game.status === 'running') {
+          ctx.emit({ type: 'start' });
+          announce(prev === 'over' ? '다시 시작합니다.' : '게임 시작.');
+        }
         ensureLoop();
       };
       const onKey = (e: KeyboardEvent): void => {
@@ -143,6 +161,7 @@ export function gameMachine(factory: GameFactory, isSupported?: () => boolean): 
 
       build();
       game?.render(); // 초기 ready 화면; 루프는 첫 입력에 시작 → reduced-motion 안전.
+      announce(READY_MSG);
 
       // 반응형: 컨테이너 크기가 바뀌면 새 크기로 게임을 재생성(디바운스).
       // ResizeObserver 미지원 환경(jsdom 등)에선 초기 크기로만 동작.
@@ -158,6 +177,7 @@ export function gameMachine(factory: GameFactory, isSupported?: () => boolean): 
               game?.destroy();
               build();
               game?.render();
+              announce(READY_MSG); // 재생성된 게임은 다시 ready 상태.
             }
           }, 200);
         });

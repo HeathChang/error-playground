@@ -40,6 +40,10 @@ export function mountCanvas(env: GameEnv): {
   const canvas = doc.createElement('canvas');
   canvas.width = env.width;
   canvas.height = env.height;
+  // 캔버스는 스크린리더에 불투명하다 → 정적 설명을 role="img"+aria-label로 준다.
+  // 점수·상태 등 동적 정보는 콘솔(gameMachine)의 aria-live 영역이 담당한다 (ruler/a11y.md).
+  canvas.setAttribute('role', 'img');
+  canvas.setAttribute('aria-label', '미니 게임 화면');
   // 논리 크기(env.width×height)로 그리되, 호스트보다 크면 축소되고 flex 호스트가 가운데 정렬한다.
   canvas.style.cssText = `display:block;max-width:100%;max-height:100%;border-radius:8px;touch-action:manipulation;`;
   env.host.appendChild(canvas);
