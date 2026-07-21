@@ -69,6 +69,16 @@ describe('loader — resolveExperience', () => {
     const exp = await resolveExperience('timing');
     expect(isExperience(exp)).toBe(true);
   });
+
+  it('should dynamically import the built-in "zigzag" experience (v2)', async () => {
+    const exp = await resolveExperience('zigzag');
+    expect(isExperience(exp)).toBe(true);
+  });
+
+  it('should dynamically import the built-in "rotor" experience (v2)', async () => {
+    const exp = await resolveExperience('rotor');
+    expect(isExperience(exp)).toBe(true);
+  });
 });
 
 describe('loader — helpers', () => {
@@ -84,6 +94,7 @@ describe('loader — helpers', () => {
     expect(hasBuiltin('gravity')).toBe(true); // v2 등록됨
     expect(hasBuiltin('timing')).toBe(true); // v2 등록됨
     expect(hasBuiltin('zigzag')).toBe(true); // v2 등록됨
+    expect(hasBuiltin('rotor')).toBe(true); // v2 등록됨
     expect(hasBuiltin('nope')).toBe(false);
   });
 
