@@ -30,6 +30,29 @@ export function mountedContainer(): HTMLElement {
 }
 
 /**
+ * 모드 B 폴백(상태코드·메시지·홈/뒤로 링크)이 미리 박힌 컨테이너.
+ * "게임이 오버레이로 떠도 이 링크들은 항상 접근 가능"이라는 a11y 불변식 검증용 (ruler/a11y.md).
+ */
+export function mountedFallbackContainer(): {
+  container: HTMLElement;
+  home: HTMLAnchorElement;
+  back: HTMLButtonElement;
+} {
+  const container = document.createElement('div');
+  const h1 = document.createElement('h1');
+  h1.textContent = '404 — 페이지를 찾을 수 없어요';
+  const home = document.createElement('a');
+  home.href = '/';
+  home.textContent = '홈으로';
+  const back = document.createElement('button');
+  back.type = 'button';
+  back.textContent = '뒤로 가기';
+  container.append(h1, home, back);
+  document.body.appendChild(container);
+  return { container, home, back };
+}
+
+/**
  * "지원 환경(Canvas 2D)" 재현용 스텁 컨텍스트를 getContext에 심는다.
  * 그리기 호출(fillRect/fillText/stroke/fill/strokeRect) 횟수를 draws()로 노출
  * → 렌더가 실제로 돌았는지만 검증(픽셀 검증은 브라우저 스모크의 영역).

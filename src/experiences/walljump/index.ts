@@ -15,7 +15,10 @@ function pickTheme(theme: 'light' | 'dark'): CanvasTheme {
 }
 
 function createWallJump(env: GameEnv): Game {
-  const { canvas, ctx } = mountCanvas(env);
+  const { canvas, ctx } = mountCanvas(env, {
+    ko: '벽점프 게임 — 벽차기로 오르기',
+    en: 'Wall-jump mini-game — climb by kicking off walls',
+  });
   const game = new WallJumpGame({ width: env.width, height: env.height, seed: makeSeed(0x27d4eb2f) });
   const theme = pickTheme(env.theme);
 

@@ -166,4 +166,34 @@ describe('gameMachine — 접근성(aria-live 상태/점수)', () => {
     expect(live.textContent).toMatch(/게임 오버/);
     expect(live.textContent).toContain('120');
   });
+
+  it('re-fires the score milestone and re-announces it after a restart (재시작 회귀)', () => {
+    const { host, raf, game, live, emit } = mountScripted();
+
+    // 1) 첫 판: 100점 마일스톤 이벤트·공지.
+    host.dispatchEvent(new Event('pointerdown')); // ready→running
+    game.setScore(120);
+    raf.step(16);
+    raf.step(200);
+    expect(emit).toHaveBeenCalledWith({ type: 'score', value: 100 });
+    expect(live.textContent).toMatch(/100/);
+
+    // 2) 게임 오버 → 입력으로 재시작(카트리지가 점수를 0으로 되돌리는 상황 시뮬).
+    game.dieNextStep();
+    raf.step(400); // running→over
+    expect(emit).toHaveBeenCalledWith({ type: 'gameover', score: 120 });
+    host.dispatchEvent(new Event('pointerdown')); // over→running(재시작)
+    game.setScore(0);
+    raf.step(600); // 프레임 → 점수 0이라 마일스톤 추적이 0으로 되감긴다
+
+    // 3) 두 번째 판에서 다시 100점 → 이벤트·공지가 재발화해야 한다.
+    //    (회귀 전엔 lastMilestone이 1로 남아 1>1이 거짓 → score 이벤트·aria-live 공지 누락)
+    emit.mockClear();
+    live.textContent = '';
+    game.setScore(120);
+    raf.step(800);
+    raf.step(1000);
+    expect(emit).toHaveBeenCalledWith({ type: 'score', value: 100 });
+    expect(live.textContent).toMatch(/100/);
+  });
 });

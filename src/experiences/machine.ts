@@ -1,13 +1,8 @@
 /**
  * gameMachine — "게임 콘솔". 게임 카트리지(Game)를 꽂아 구동하는 공통 셸.
- *
- * 콘솔이 공통으로 담당:
- *  - 고정 timestep 게임 루프 (rAF)
- *  - 입력 라우팅 (스페이스/↑/포인터 → game.input())
- *  - 라이프사이클 이벤트 emit (start / score / gameover)
- *  - reduced-motion 안전: 루프는 첫 입력(opt-in) 후 시작
- *  - **반응형 사이징**: 컨테이너를 채우고, 게임은 캡 크기로 가운데 정렬. 리사이즈 시 재생성(ResizeObserver)
- *  - 마운트/언마운트 정리
+ * 콘솔이 공통 담당: 고정 timestep 루프(rAF) · 입력 라우팅(스페이스/↑/포인터→game.input())
+ * · 라이프사이클 이벤트(start/score/gameover) · reduced-motion 안전(첫 입력 opt-in 후 시작)
+ * · 반응형 사이징(컨테이너 채움+캡+가운데 정렬, ResizeObserver 재생성) · 마운트/언마운트 정리.
  */
 import type { Experience, ExperienceContext } from '../core/types';
 
@@ -20,6 +15,7 @@ export interface GameEnv {
   reducedMotion: boolean;
   width: number;
   height: number;
+  locale: string; // 코어가 확정한 locale — 카트리지/canvas.ts의 a11y 대체 텍스트 언어에 사용
 }
 
 /** 게임 카트리지 계약. */
@@ -76,8 +72,7 @@ export function gameMachine(factory: GameFactory, isSupported?: () => boolean): 
       container.appendChild(h);
       host = h;
 
-      // 스크린리더용 상태/점수 라이브 영역(시각적으로 숨김). 캔버스는 SR에 불투명하므로
-      // 준비/시작/점수/게임오버를 텍스트로도 전달한다 (ruler/a11y.md "캔버스/게임 접근성").
+      // SR용 상태/점수 라이브 영역(시각 숨김) — 캔버스는 SR에 불투명하니 준비/시작/점수/게임오버를 텍스트로도 전달 (ruler/a11y.md).
       const live = doc.createElement('p');
       live.className = 'ep-game-status';
       live.setAttribute('aria-live', 'polite');
@@ -95,8 +90,7 @@ export function gameMachine(factory: GameFactory, isSupported?: () => boolean): 
 
       const build = (): void => {
         const { width, height } = measure(h);
-        game = factory({ host: h, theme: ctx.theme, reducedMotion: ctx.reducedMotion, width, height });
-        lastMilestone = 0;
+        game = factory({ host: h, theme: ctx.theme, reducedMotion: ctx.reducedMotion, width, height, locale: ctx.locale });
       };
 
       const frame = (t: number): void => {
@@ -115,6 +109,7 @@ export function gameMachine(factory: GameFactory, isSupported?: () => boolean): 
         game.render();
 
         const milestone = Math.floor(game.score / 100);
+        if (milestone < lastMilestone) lastMilestone = milestone; // 재시작/리사이즈로 점수 되감기면 마일스톤 리셋 → 다음 판 100/200점 이벤트·공지 재발화
         if (milestone > lastMilestone) {
           lastMilestone = milestone;
           ctx.emit({ type: 'score', value: milestone * 100 });

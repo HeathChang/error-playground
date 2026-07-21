@@ -31,8 +31,31 @@ export function makeSeed(salt: number): number {
   return (Math.floor(now) ^ salt) >>> 0 || 1;
 }
 
-/** env.host에 게임용 canvas를 만들어 붙이고 2D 컨텍스트와 함께 반환. */
-export function mountCanvas(env: GameEnv): {
+/** 카트리지가 넘기는 게임별 접근성 설명(언어쌍). 프레임워크 독립 라이브러리라 언어를 하드코딩하지 않는다. */
+export interface CanvasLabel {
+  ko: string;
+  en: string;
+}
+
+/**
+ * 캔버스 role="img"에 넣을 정적 대체 텍스트를 결정한다.
+ * 카트리지가 게임별 설명을 넘기면 locale에 맞는 언어를, 없으면 중립 기본값을 쓴다
+ * (ruler/a11y.md, ExperienceContext.locale 존중 — ko 외 로케일에서 한국어 고정 텍스트가 새지 않게).
+ */
+export function canvasLabel(locale: string, label?: CanvasLabel): string {
+  const isKo = locale.toLowerCase().startsWith('ko');
+  if (label) return isKo ? label.ko : label.en;
+  return isKo ? '미니 게임 화면' : 'Mini-game';
+}
+
+/**
+ * env.host에 게임용 canvas를 만들어 붙이고 2D 컨텍스트와 함께 반환.
+ * @param label 게임별 접근성 설명(선택) — 없으면 env.locale 기준 중립 텍스트.
+ */
+export function mountCanvas(
+  env: GameEnv,
+  label?: CanvasLabel,
+): {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D | null;
 } {
@@ -40,10 +63,10 @@ export function mountCanvas(env: GameEnv): {
   const canvas = doc.createElement('canvas');
   canvas.width = env.width;
   canvas.height = env.height;
-  // 캔버스는 스크린리더에 불투명하다 → 정적 설명을 role="img"+aria-label로 준다.
-  // 점수·상태 등 동적 정보는 콘솔(gameMachine)의 aria-live 영역이 담당한다 (ruler/a11y.md).
+  // 캔버스는 SR에 불투명 → 정적 설명을 role="img"+aria-label로. 점수·상태 등 동적 정보는
+  // 콘솔(gameMachine)의 aria-live가 담당. 라벨은 locale 대응 + 카트리지별 설명 (ruler/a11y.md).
   canvas.setAttribute('role', 'img');
-  canvas.setAttribute('aria-label', '미니 게임 화면');
+  canvas.setAttribute('aria-label', canvasLabel(env.locale, label));
   // 논리 크기(env.width×height)로 그리되, 호스트보다 크면 축소되고 flex 호스트가 가운데 정렬한다.
   canvas.style.cssText = `display:block;max-width:100%;max-height:100%;border-radius:8px;touch-action:manipulation;`;
   env.host.appendChild(canvas);
