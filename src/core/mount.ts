@@ -7,7 +7,7 @@
  *       (에러 페이지를 다시 깨뜨리지 않기 위한 원칙, docs/PLAN.md §5.4).
  */
 import { resolveLocale, resolveReducedMotion, resolveTheme } from './context';
-import { detectMode, renderFallback } from './fallback';
+import { detectMode, ensureStyle, renderFallback, safeHref } from './fallback';
 import { resolveExperience } from './loader';
 import type {
   Experience,
@@ -65,14 +65,49 @@ export function mount(target: string | HTMLElement, config: PlaygroundConfig = {
 
   let experienceHost: HTMLElement | null = null;
   let currentExperience: Experience | null = null;
+  let exitNav: HTMLElement | null = null;
   let disposed = false;
   let loadToken = 0;
+
+  /**
+   * 경험 오버레이가 폴백을 덮는 동안에도 홈/뒤로 링크에 **포인터·키보드로 항상 도달**하도록,
+   * 오버레이 위(z-index)·바깥(별도 서브트리)에 뜨는 코어 소유 탐색 레이어를 만든다.
+   * a11y 최우선 불변식(ruler/a11y.md · docs/PLAN.md §5.4/§14): "폴백 링크는 항상 접근 가능".
+   * 게임 입력(`.ep-game`의 pointerdown)과 별개 서브트리라 링크 클릭이 게임 입력으로 새지 않는다.
+   * (경험 종류 무관 — canvas 게임·cube·iframe 오버레이 모두 이 한 지점으로 커버된다.)
+   */
+  const buildExitNav = (): HTMLElement => {
+    const doc = container.ownerDocument;
+    ensureStyle(doc); // 모드 B(코어가 폴백을 그리지 않은 경우)에도 exit 스타일 보장.
+    const nav = doc.createElement('nav');
+    nav.className = 'ep-exit';
+    nav.style.cssText = 'position:absolute;top:8px;right:8px;z-index:2;display:flex;gap:8px;pointer-events:auto;';
+    nav.setAttribute('aria-label', '에러 페이지 이동'); // 홈/뒤로 랜드마크(시맨틱 <nav> + 라벨).
+
+    const home = doc.createElement('a');
+    home.className = 'ep-exit-link';
+    home.href = safeHref(config.links?.home); // open-redirect/javascript: 차단 (ruler/security.md)
+    home.textContent = '홈으로';
+    nav.appendChild(home);
+
+    if (config.links?.back) {
+      const back = doc.createElement('button');
+      back.type = 'button';
+      back.className = 'ep-exit-link ep-exit-link--ghost';
+      back.textContent = '뒤로';
+      back.addEventListener('click', () => doc.defaultView?.history.back());
+      nav.appendChild(back);
+    }
+    return nav;
+  };
 
   const teardownExperience = (): void => {
     currentExperience?.unmount();
     currentExperience = null;
     experienceHost?.remove();
     experienceHost = null;
+    exitNav?.remove();
+    exitNav = null;
   };
 
   const load = async (spec: string | Experience): Promise<void> => {
@@ -109,6 +144,9 @@ export function mount(target: string | HTMLElement, config: PlaygroundConfig = {
         return;
       }
       currentExperience = experience;
+      // 경험이 폴백을 덮은 뒤, 그 위·바깥에 항상 접근 가능한 홈/뒤로 탐색을 얹는다(불변식, §5.4/§14).
+      exitNav = buildExitNav();
+      container.appendChild(exitNav);
     } catch (cause) {
       emit({ type: 'error', cause }); // 폴백 유지 (docs/PLAN.md §5.4 불변식)
     }

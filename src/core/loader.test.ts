@@ -84,6 +84,11 @@ describe('loader — resolveExperience', () => {
     const exp = await resolveExperience('walljump');
     expect(isExperience(exp)).toBe(true);
   });
+
+  it('should dynamically import the built-in "charge" experience (v2)', async () => {
+    const exp = await resolveExperience('charge');
+    expect(isExperience(exp)).toBe(true);
+  });
 });
 
 describe('loader — helpers', () => {
@@ -101,6 +106,7 @@ describe('loader — helpers', () => {
     expect(hasBuiltin('zigzag')).toBe(true); // v2 등록됨
     expect(hasBuiltin('rotor')).toBe(true); // v2 등록됨
     expect(hasBuiltin('walljump')).toBe(true); // v2 등록됨
+    expect(hasBuiltin('charge')).toBe(true); // v2 등록됨
     expect(hasBuiltin('nope')).toBe(false);
   });
 

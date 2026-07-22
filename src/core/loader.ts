@@ -30,6 +30,7 @@ const BUILTINS: Record<string, () => Promise<unknown>> = {
   zigzag: () => import('../experiences/zigzag/index'),
   rotor: () => import('../experiences/rotor/index'),
   walljump: () => import('../experiences/walljump/index'),
+  charge: () => import('../experiences/charge/index'),
 };
 
 export function hasBuiltin(name: string): boolean {

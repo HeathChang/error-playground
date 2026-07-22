@@ -61,7 +61,7 @@
 | --- | --- | --- | --- |
 | 통합 API | 명령형 `mount(el, config)` + **Custom Element `<error-playground>`** | — | `mount()`=범용 명령형, CE=모든 프레임워크용 선언적 태그 (vision §4, CE v1 승격 2026-07-01) |
 | 폴백 | Tier 0 정적 폴백 (인라인, 모드 A/B) | — | 장애 대응의 근간, 필수 |
-| 경험(게임) | **러너·큐브·플래피·스태커·오빗·리듬·중력반전·타이밍스톱·지그재그·로터·벽점프** + contract 검증용 `noop` | 다수 게임 무한 확장(장르 중복) | 공통 콘솔로 카트리지처럼 구동 (vision §4, 2026-07-08~07-20) |
+| 경험(게임) | **러너·큐브·플래피·스태커·오빗·리듬·중력반전·타이밍스톱·지그재그·로터·벽점프·충전** + contract 검증용 `noop` | 다수 게임 무한 확장(장르 중복) | 공통 콘솔로 카트리지처럼 구동 (vision §4, 2026-07-08~07-22) |
 | 게임 배관 | 공통 콘솔 **`gameMachine`** + Canvas 공통 헬퍼 **`canvas.ts`** | — | 6종 canvas/CSS-3D 게임 중복 제거 (vision §4, 2026-07-14) |
 | iframe | **sandbox iframe 임베드** (Tier 4) | — | 외부 콘텐츠 오프로드 (vision §4, v2 승격 2026-07-04). 보안 경계 §5.6 |
 | 3D | ❌ | **WebGL(Three.js)** | 용량(~150KB)이 경량 정신과 충돌 (vision §5) |
@@ -127,7 +127,7 @@
   - 장점: **JS가 실패해도 정적 에러가 그대로 보인다.** → 500 대응의 정답.
   - **권장: 에러 페이지에는 모드 B + 코어 인라인.**
 
-코어 판별 규칙(`detectMode`): 컨테이너에 자식 노드가 있으면 → 폴백으로 간주(모드 B). 비어 있으면 → Tier 0을 렌더(모드 A). 경험은 `position:absolute; inset:0` 호스트에 얹혀 폴백 위를 덮되, 폴백 DOM은 **제거하지 않고 유지**한다(경험 언마운트 시 그대로 노출).
+코어 판별 규칙(`detectMode`): 컨테이너에 자식 노드가 있으면 → 폴백으로 간주(모드 B). 비어 있으면 → Tier 0을 렌더(모드 A). 경험은 `position:absolute; inset:0` 호스트에 얹혀 폴백 위를 덮되, 폴백 DOM은 **제거하지 않고 유지**한다(경험 언마운트 시 그대로 노출). 경험 오버레이가 폴백의 **인터랙티브 요소(홈/뒤로 링크)를 시각적으로 가리거나 포인터를 가로채는** 문제는, 코어가 오버레이 **바깥·위(z-index)** 에 얹는 탐색 레이어 `.ep-exit`로 해소한다(§14 — a11y 불변식의 실제 강제 지점).
 
 ### 5.3 코어 ↔ Experience 인터페이스 (`src/core/types.ts`)
 
@@ -179,7 +179,7 @@ interface ExperienceContext {
 
 ### 5.5 게임 콘솔 ↔ 카트리지 계약 (`src/experiences/machine.ts`) ⭐ (신규)
 
-게임은 공통 콘솔 **`gameMachine`** 에 꽂는 **카트리지(`Game`)** 다. 콘솔이 배관을 전담하므로 게임은 순수 로직만 작성한다 → 러너·큐브·플래피·스태커·오빗·리듬·중력반전·타이밍스톱·지그재그·로터·벽점프가 동일 lifecycle을 공유한다.
+게임은 공통 콘솔 **`gameMachine`** 에 꽂는 **카트리지(`Game`)** 다. 콘솔이 배관을 전담하므로 게임은 순수 로직만 작성한다 → 러너·큐브·플래피·스태커·오빗·리듬·중력반전·타이밍스톱·지그재그·로터·벽점프·충전이 동일 lifecycle을 공유한다.
 
 **카트리지 계약(`Game`):**
 ```ts
@@ -211,7 +211,7 @@ function gameMachine(factory: GameFactory, isSupported?: () => boolean): Experie
 | 정리(`unmount`) | `cancelAnimationFrame`, 리스너 제거, `ResizeObserver.disconnect()`+`clearTimeout`, `game.destroy()`, host 노드 제거 | `destroy()`에서 자신이 만든 canvas/뷰 노드만 제거 |
 
 **렌더링 계약 (Canvas ↔ CSS-3D 경계):** 콘솔은 **렌더 방식에 무관**하다 — `render()`가 무엇을 그리든 상관 안 함.
-- **Canvas 게임**(러너·플래피·스태커·오빗·리듬·중력반전·타이밍스톱·지그재그·로터·벽점프): `canvas.ts`의 `mountCanvas(env)`로 `<canvas>` 부착, `render.ts`가 2D 컨텍스트에 그린다. 지원 체크 = `canvasSupported()`.
+- **Canvas 게임**(러너·플래피·스태커·오빗·리듬·중력반전·타이밍스톱·지그재그·로터·벽점프·충전): `canvas.ts`의 `mountCanvas(env)`로 `<canvas>` 부착, `render.ts`가 2D 컨텍스트에 그린다. 지원 체크 = `canvasSupported()`.
 - **CSS-3D 게임**(큐브): `canvas.ts`를 쓰지 않고 `createCubeView(host,theme)`로 DOM/CSS 3D 뷰를 만들며 `render()`는 `view.update(game)`로 DOM을 갱신한다. 지원 체크 = `cubeSupported()`(`CSS.supports('transform-style','preserve-3d')`).
 - 따라서 **같은 콘솔**이 두 렌더 방식을 모두 구동하고, 카트리지별 `isSupported`만 다르다. 새 게임은 `game.ts`(순수)+`render.ts`+`index.ts`(어댑터)만 추가하면 된다.
 
@@ -298,7 +298,7 @@ type PlaygroundEvent =
 
 `experience`에 넘길 수 있는 내장 이름(각각 별도 lazy 청크로 동적 import):
 
-`'noop'`(contract 검증) · `'runner'` · `'iframe'` · `'cube'` · `'flappy'` · `'stacker'` · `'orbit'` · `'rhythm'` · `'gravity'` · `'timing'` · `'zigzag'` · `'rotor'` · `'walljump'`.
+`'noop'`(contract 검증) · `'runner'` · `'iframe'` · `'cube'` · `'flappy'` · `'stacker'` · `'orbit'` · `'rhythm'` · `'gravity'` · `'timing'` · `'zigzag'` · `'rotor'` · `'walljump'` · `'charge'`.
 
 > `BuiltinName`을 **좁은 union으로 고정하지 않는다**(`experience?: string | Experience`). 새 게임 추가 = `BUILTINS`에 1줄 등록이면 되고, 타입 변경이 불필요하다. 잘못된 이름은 런타임에서 `error` 이벤트로 처리(§6.3).
 
@@ -412,7 +412,7 @@ return <div ref={ref}><h1>404</h1><a href="/">홈</a></div>; // 폴백 동봉
 | --- | --- | --- | --- | --- | --- |
 | **0** | 정적 폴백 | ~1–2KB | 상태코드+메시지+홈 | 없음 | ✅ 코어 내장 |
 | **1** | CSS/DOM | ~3–5KB | **CSS-3D 큐브 탭** / contract용 `noop` | 없음 | ✅ |
-| **2** | Canvas 2D | ~10–20KB | **러너·플래피·스태커·오빗·리듬·중력반전·타이밍스톱·지그재그·로터·벽점프** | 없음 | ✅ |
+| **2** | Canvas 2D | ~10–20KB | **러너·플래피·스태커·오빗·리듬·중력반전·타이밍스톱·지그재그·로터·벽점프·충전** | 없음 | ✅ |
 | **3** | WebGL/3D | lazy ~150KB+ | 3D 씬 | Three.js | ❌ Out of Scope (vision §5) |
 | **4** | iframe | 가변 | 외부 게임/콘텐츠 | sandbox | ✅ (보안 경계 §5.6) |
 
@@ -443,7 +443,7 @@ return <div ref={ref}><h1>404</h1><a href="/">홈</a></div>; // 폴백 동봉
 │   └── experiences/
 │       ├── machine.ts      # gameMachine 공통 콘솔 (§5.5)
 │       ├── canvas.ts       # Canvas 공통 헬퍼(canvasSupported/makeSeed/mountCanvas)
-│       ├── runner|flappy|stacker|orbit|rhythm|gravity|timing|zigzag|rotor|walljump/  # Canvas 카트리지 (game/render/index/*.test)
+│       ├── runner|flappy|stacker|orbit|rhythm|gravity|timing|zigzag|rotor|walljump|charge/  # Canvas 카트리지 (game/render/index/*.test)
 │       ├── cube/           # CSS-3D 카트리지
 │       ├── iframe/         # Tier 4 임베드 (§5.6)
 │       └── _noop/          # contract 검증용 trivial
@@ -465,6 +465,7 @@ return <div ref={ref}><h1>404</h1><a href="/">홈</a></div>; // 폴백 동봉
 ## 14. 접근성 & UX 가드레일
 
 - **에러 정보 우선**: 어떤 경험이든 상태코드·핵심 메시지·홈/뒤로 링크는 폴백 DOM에 항상 존재(불변식, §5.4). 경험은 오버레이이며 폴백 노드를 제거하지 않는다.
+- **폴백 탐색은 오버레이 위·바깥에(`.ep-exit`) ⭐**: "DOM에 존재·프로그램적 focus 가능"만으로는 부족하다 — 접근 가능은 **실제 키보드·포인터 사용자 모두**가 도달·활성화할 수 있어야 한다. 경험 오버레이(예: 불투명 canvas 게임 호스트 `.ep-game`가 `inset:0`을 덮고 `pointerdown`을 캡처)가 폴백 링크를 가리는 회귀를 막기 위해, 코어(`mount.ts`)는 경험이 성공적으로 마운트되는 즉시 오버레이 **바깥의 별도 서브트리**에 **항상 위(z-index)로 뜨는** 탐색 레이어 `.ep-exit`(`pointer-events:auto`, 홈 + 옵션 뒤로, `safeHref` 검증)를 얹고 언마운트/전환 시 제거한다. 게임 입력과 다른 서브트리라 링크 클릭이 게임 입력으로 새지 않으며, 캔버스 게임·cube·iframe 등 **오버레이를 쓰는 모든 경험**이 이 한 지점으로 커버된다. 구조/이벤트 계약(오버레이 밖·z-index 위·pointer-events·게임 입력 분리)은 `core/mount.test.ts`가 검증하고, 픽셀 단위 hit-test·포커스 가시성은 브라우저 스모크(§15)가 보완한다.
 - `prefers-reduced-motion: reduce` → 게임 루프는 **첫 입력 opt-in** 후 시작(콘솔이 처리, §5.5).
 - 키보드 완전 조작(게임 host `tabIndex=0`, `role=application`), 포커스 트랩 금지.
 - 소리 기본 OFF, 사용자 액션 후에만.
@@ -491,7 +492,7 @@ return <div ref={ref}><h1>404</h1><a href="/">홈</a></div>; // 폴백 동봉
 | **M2 — 플래그십: Canvas 러너** | 공룡게임류 러너 + 공통 콘솔(`gameMachine`) | ✅ |
 | **M3 — 통합 API/예제** | Custom Element `<error-playground>`, vanilla/React 예제, CSP 안내 | ✅ (CE 승격 2026-07-01) |
 | **v2 — 경험 확장** | iframe(§5.6) + 큐브·플래피·스태커·오빗·리듬 카트리지, `canvas.ts` 추출 | ✅ (vision §4 2026-07-04~07-14) |
-| **진행 — 신규 게임 추가** | 요청 "게임 추가" → 카트리지 1종씩 신설 (중력반전 2026-07-16, 타이밍스톱 2026-07-17, 지그재그 2026-07-19, 로터 2026-07-19, 벽점프 2026-07-20) | ✅ (vision §4/§10 갱신) |
+| **진행 — 신규 게임 추가** | 요청 "게임 추가" → 카트리지 1종씩 신설 (중력반전 2026-07-16, 타이밍스톱 2026-07-17, 지그재그 2026-07-19, 로터 2026-07-19, 벽점프 2026-07-20, 충전 2026-07-22) | ✅ (vision §4/§10 갱신) |
 | **후속 — iframe 하드닝** | §5.6 D1–D4 확정 정책 구현(`//` 거부·sandbox 콤보 거부·referrerpolicy·타임아웃→폴백) + 테스트 | 📋 별개 트랙(게임 추가와 독립, 승인 불요) |
 
 > WebGL/3D·공개 레지스트리·auto Tier는 **Out of Scope**(vision.md §5).
@@ -537,5 +538,5 @@ return <div ref={ref}><h1>404</h1><a href="/">홈</a></div>; // 폴백 동봉
 
 > **"Tiny Core + Lazy Experiences + Fallback-first + One Console, Many Cartridges"**.
 > 코어는 **인라인 가능한 극경량 로더**로 어떤 환경에서도 즉시 에러 폴백을 보장하고(500에도 강함), 무거운 콘텐츠(게임·iframe)는 **동적 청크**로 필요할 때만 로드한다.
-> 게임은 공통 콘솔 `gameMachine`에 꽂는 **카트리지**로, 러너·큐브·플래피·스태커·오빗·리듬·중력반전·타이밍스톱·지그재그·로터·벽점프가 동일 lifecycle·입력·이벤트를 공유한다(§5.5). 통합은 `mount()` + 표준 Custom Element `<error-playground>`로 모든 프레임워크를 커버한다(§6.4).
+> 게임은 공통 콘솔 `gameMachine`에 꽂는 **카트리지**로, 러너·큐브·플래피·스태커·오빗·리듬·중력반전·타이밍스톱·지그재그·로터·벽점프·충전이 동일 lifecycle·입력·이벤트를 공유한다(§5.5). 통합은 `mount()` + 표준 Custom Element `<error-playground>`로 모든 프레임워크를 커버한다(§6.4).
 > 불변식 "에러 정보는 항상 보인다"가 설계 전반을 관통하며, iframe 보안 세부 정책(§5.6)은 유저 승인 대기 중이다.

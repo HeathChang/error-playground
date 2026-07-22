@@ -35,8 +35,15 @@ function messagesFor(status: ErrorStatus, config: PlaygroundConfig): { title: st
 
 const STYLE_ID = 'ep-fallback-style';
 
-/** 스코프된 폴백 스타일을 1회만 주입한다(`.ep-root` 한정 — 호스트 CSS 미오염). */
-function ensureStyle(doc: Document): void {
+/**
+ * 폴백/탐색 스타일을 1회만 주입한다.
+ * - `.ep-root` 규칙은 Tier 0 폴백 한정(호스트 CSS 미오염).
+ * - `.ep-exit` 규칙은 경험 오버레이 위에 뜨는 코어 탐색 레이어용(모드 A·B 공통, `mount.ts`가 사용).
+ *   경험이 폴백을 덮는 동안에도 홈/뒤로 링크가 보이고 눌리도록 강제하는 a11y 불변식 장치
+ *   (ruler/a11y.md · docs/PLAN.md §5.4/§14). 어떤 게임 배경 위에서도 대비를 확보하려고
+ *   자체 배경/그림자를 가지며(테마 무관), 대비는 흰 글자 ↔ #0369a1 ≈ 5.9:1로 WCAG AA 충족.
+ */
+export function ensureStyle(doc: Document): void {
   if (doc.getElementById(STYLE_ID)) return;
   const style = doc.createElement('style');
   style.id = STYLE_ID;
@@ -54,6 +61,13 @@ function ensureStyle(doc: Document): void {
   background:var(--ep-color-brand);color:#fff;text-decoration:none;font-size:.9rem;cursor:pointer;}
 .ep-root .ep-btn--ghost{background:transparent;color:var(--ep-color-brand);}
 .ep-root .ep-btn:focus-visible{outline:2px solid var(--ep-color-focus);outline-offset:2px;}
+.ep-exit{position:absolute;top:8px;right:8px;z-index:2;display:flex;gap:8px;pointer-events:auto;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;}
+.ep-exit .ep-exit-link{display:inline-block;padding:6px 12px;border-radius:8px;border:1px solid #0369a1;
+  background:#0369a1;color:#fff;text-decoration:none;font-size:.8rem;font-weight:600;line-height:1.2;cursor:pointer;
+  box-shadow:0 1px 4px rgba(15,23,42,.35);}
+.ep-exit .ep-exit-link--ghost{background:#fff;color:#0369a1;}
+.ep-exit .ep-exit-link:focus-visible{outline:2px solid #0369a1;outline-offset:2px;}
 `.trim();
   doc.head.appendChild(style);
 }
